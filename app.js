@@ -7,6 +7,7 @@ var usersRouter = require('./routes/users')
 var filmRouter = require('./routes/films')
 var musicRouter = require('./routes/musics')
 var bookRouter = require('./routes/books')
+var detailRouter = require('./routes/detail')
 
 var app = express()
 
@@ -20,5 +21,6 @@ app.use('/', usersRouter)
 app.use('/', filmRouter)
 app.use('/', musicRouter)
 app.use('/', bookRouter)
+app.use('/', detailRouter)
 
 module.exports = app;
