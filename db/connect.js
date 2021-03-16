@@ -122,6 +122,7 @@ const recordSchema = new Schema({
   },
   status: {
     type: String,
+    default: 'none',
     enum: ['want', 'doing', 'after', 'none']
   },
   wantComment: {
@@ -130,11 +131,19 @@ const recordSchema = new Schema({
   wantCommentTime: {
     type: String
   },
+  wantCommentLikedNum: {
+    type: Number,
+    default: 0
+  },
   afterComment: {
     type: String
   },
   afterCommentTime: {
     type: String
+  },
+  afterCommentLikedNum: {
+    type: Number,
+    default: 0
   },
   score: {
     type: Number
