@@ -22,7 +22,7 @@ const userSchema = new Schema({
   }
 })
 const bookSchema = new Schema({
-  bookName: {
+  name: {
     type: String,
     required: true
   },
@@ -38,7 +38,7 @@ const bookSchema = new Schema({
   coverSrc: {
     type: String
   },
-  bookIntroduction: {
+  introduction: {
     type: String
   },
   authorIntroduction: {
@@ -52,9 +52,10 @@ const bookSchema = new Schema({
     enum: ['计算机图书', '小说', '名著']
   }
 })
-bookSchema.index({bookName: 1, bookType: 1}, {unique: true})
+bookSchema.index({name: 1, bookType: 1}, {unique: true})
+
 const filmSchema = new Schema({
-  chineseName: {
+  name: {
     type: String,
     required: true,
     unique: true
@@ -75,8 +76,9 @@ const filmSchema = new Schema({
     type: String
   }
 })
+
 const musicSchema = new Schema({
-  musicName: {
+  name: {
     type: String,
     required: true,
     unique: true
