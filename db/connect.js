@@ -15,12 +15,19 @@ const db = mongoose.connection
 
 //集合规则
 const userSchema = new Schema({
-  openId: {
-    type: Number,
+  openid: {
+    type: String,
     required: true,
     unique: true
+  },
+  nickName: {
+    type: String
+  },
+  avatarUrl: {
+    type: String
   }
 })
+
 const bookSchema = new Schema({
   name: {
     type: String,
@@ -100,7 +107,43 @@ const musicSchema = new Schema({
   }
 })
 
+const recordSchema = new Schema({
+  openid: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  kind: {
+    type: String,
+    enum: ['book', 'film', 'music']
+  },
+  name: {
+    type: String
+  },
+  status: {
+    type: String,
+    enum: ['want', 'doing', 'after', 'none']
+  },
+  wantComment: {
+    type: String
+  },
+  wantCommentTime: {
+    type: String
+  },
+  afterComment: {
+    type: String
+  },
+  afterCommentTime: {
+    type: String
+  },
+  score: {
+    type: Number
+  }
+})
+recordSchema.index({openid: 1, kind: 1, name: 1}, {unique: true})
+
 exports.User = mongoose.model('User', userSchema)
 exports.Book = mongoose.model('Book', bookSchema)
 exports.Film = mongoose.model('Film', filmSchema)
 exports.Music = mongoose.model('Music', musicSchema)
+exports.Record = mongoose.model('Record', recordSchema)
