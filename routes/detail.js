@@ -2,7 +2,7 @@ const {Book, Film, Music, Record} =  require('../db/connect')
 const express = require('express')
 const router = express.Router()
 
-router.get('/detailById', async(req, res) => {
+router.get('/detail', async(req, res) => {
   let obj = req.query
   let kind = obj.kind
   let data = null
@@ -18,7 +18,7 @@ router.get('/detailById', async(req, res) => {
     openid: obj.openid,
     kind: obj.kind,
     name: data.name
-  })
+  }).sort({_id: -1})
   if (record) {
     status = record.status
   }

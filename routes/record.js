@@ -1,23 +1,13 @@
 const express = require('express')
 const router = express.Router()
-const { Record } = require('../db/connect')
+const { Record, LikeComment } = require('../db/connect')
 
-router.post('/addOrUpdateRecord', async(req, res) => {
+router.post('/addRecord', async(req, res) => {
   let obj = req.body
-  const record = await Record.findOne({
-    openid: obj.openid,
-    kind: obj.kind,
-    name: obj.name
-  })
-  if (record) {
-    await Record.updateOne({
-      openid: obj.openid,
-      kind: obj.kind,
-      name: obj.name
-    }, obj)
-  } else {
-    await Record.create(obj)
+  if (obj.status === 'doing' || obj.status === 'none') {
+    await Record.deleteOne(obj)
   }
+  await Record.create(obj)
   res.send(JSON.stringify({
     code: 0,
     msg: '添加成功'
@@ -32,12 +22,24 @@ router.get('/getComments', async(req, res) => {
         from: 'users',
         localField: 'openid',
         foreignField: 'openid',
-        as: 'users'
+        as: 'user'
       }
     },
-    {$unwind: '$users'},
-    {$match: {'users.openid': obj.openid, kind: obj.kind, name: obj.name}}
+    {$unwind: '$user'},
+    {$match: {kind: obj.kind, name: obj.name, status: obj.status}},
+    {$sort: {commentTime: -1}}
   ])
+  for(let comment of data) {
+    const liked = await LikeComment.findOne({
+      openid: obj.openid,
+      recordId: comment._id
+    })
+    if (liked) {
+      comment.liked = true
+    } else {
+      comment.liked = false
+    }
+  }
   res.send(JSON.stringify({
     code: 0,
     msg: '添加成功',

@@ -125,34 +125,35 @@ const recordSchema = new Schema({
     default: 'none',
     enum: ['want', 'doing', 'after', 'none']
   },
-  wantComment: {
+  comment: { // want, after才有
     type: String
   },
-  wantCommentTime: {
+  commentTime: {
     type: String
   },
-  wantCommentLikedNum: {
+  commentLikedNum: {
     type: Number,
     default: 0
   },
-  afterComment: {
-    type: String
-  },
-  afterCommentTime: {
-    type: String
-  },
-  afterCommentLikedNum: {
-    type: Number,
-    default: 0
-  },
-  score: {
+  score: {  // after 才有
     type: Number
   }
 })
-recordSchema.index({openid: 1, kind: 1, name: 1}, {unique: true})
+recordSchema.index({openid: 1, kind: 1, name: 1, status: 1, commentTime: 1}, {unique: true})
+
+const likeCommentSchema = new Schema({
+  openid: {
+    type: String
+  },
+  recordId: {
+    type: Schema.ObjectId
+  }
+})
+likeCommentSchema.index({openid: 1, recordId: 1}, {unique: true})
 
 exports.User = mongoose.model('User', userSchema)
 exports.Book = mongoose.model('Book', bookSchema)
 exports.Film = mongoose.model('Film', filmSchema)
 exports.Music = mongoose.model('Music', musicSchema)
 exports.Record = mongoose.model('Record', recordSchema)
+exports.LikeComment = mongoose.model('LikeComment', likeCommentSchema)
