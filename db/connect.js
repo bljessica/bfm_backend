@@ -126,7 +126,8 @@ const recordSchema = new Schema({
     enum: ['want', 'doing', 'after', 'none']
   },
   comment: { // want, after才有
-    type: String
+    type: String,
+    default: ''
   },
   commentTime: {
     type: String
