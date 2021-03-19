@@ -14,7 +14,7 @@ router.post('/addRecord', async(req, res) => {
   }))
 })
 
-router.get('/getComments', async(req, res) => {
+router.get('/itemComments', async(req, res) => {
   let obj = req.query
   const data = await Record.aggregate([
     {
@@ -43,6 +43,60 @@ router.get('/getComments', async(req, res) => {
   res.send(JSON.stringify({
     code: 0,
     msg: '添加成功',
+    data
+  }))
+})
+
+router.get('/userAnalysis', async(req, res) => {
+  let obj = req.query
+  const data = await Record.aggregate([
+    {$match: {openid: obj.openid}},
+    {
+      $group: {
+        _id: {status: '$status', kind: '$kind'},
+        count: {$sum: 1}
+      }
+    }
+  ])
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '查询成功',
+    data
+  }))
+})
+
+router.get('/filmTagAnalysis', async (req, res) => {
+  let obj = req.query
+  const records = await Record.aggregate([
+    {
+      $match: {openid: obj.openid, kind: 'film', status: obj.status || 'after'}
+    },
+    {
+      $lookup: {
+        from: 'films',
+        localField: 'name',
+        foreignField: 'name',
+        as: 'films'
+      }
+    },
+    {$unwind: '$films'},
+    {$project: {type: '$films.type'}}
+  ])
+  let data = {}
+  records.forEach(record => {
+    const item = record.type.substring(0, record.type.length - 1)
+    const tags = item.split(' ')
+    tags.forEach(tag => {
+      if (data[tag]) {
+        data[tag]++
+      } else {
+        data[tag] = 1
+      }
+    })
+  })
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '查询成功',
     data
   }))
 })
