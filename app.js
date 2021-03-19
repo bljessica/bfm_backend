@@ -10,6 +10,7 @@ var bookRouter = require('./routes/book')
 var detailRouter = require('./routes/detail')
 var recordRouter = require('./routes/record')
 var likeCommentRouter = require('./routes/likeComment')
+var searchRouter = require('./routes/search')
 
 var app = express()
 
@@ -26,5 +27,6 @@ app.use('/', bookRouter)
 app.use('/', detailRouter)
 app.use('/', recordRouter)
 app.use('/', likeCommentRouter)
+app.use('/', searchRouter)
 
 module.exports = app;
