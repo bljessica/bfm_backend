@@ -7,13 +7,20 @@ async function saveFilmsToDB () {
   const dataArr = data.split('\n')
   for(let line of dataArr) {
     const arr = line.split('\t')
+    const intro = arr[7]
+    const intros = intro?.split('@')
+    const filmMakers = intros[0]?.split('/')[0]?.split('???')
     if (/.*http.*/.test(arr[1])) {
       await Film.create({
         name: arr[2],
         foreignName: arr[3],
         coverSrc: arr[1],
         introduction: arr[6],
-        relatedInfo: arr[7],
+        director: filmMakers[0],
+        actors: filmMakers[1],
+        publishTime: intros[1],
+        country: intros[2],
+        type: intros[3],
         score: arr[4]
       }).catch(err => {
         console.log(err)
@@ -33,7 +40,7 @@ async function saveMusicsToDB () {
         name: arr[1],
         singer: arr[2],
         publishTime: arr[3],
-        musicType: arr[4],
+        type: arr[4],
         coverSrc: arr[7],
         score: arr[5]
       }).catch(err => {
@@ -43,7 +50,7 @@ async function saveMusicsToDB () {
   }
 }
 
-async function saveBooksToDB (bookType, filePath) {
+async function saveBooksToDB (type, filePath) {
   const data = fs.readFileSync(filePath, 'utf8')
   console.log(filePath + '文件读取完成')
   const dataArr = data.split('\n')
@@ -59,7 +66,7 @@ async function saveBooksToDB (bookType, filePath) {
         introduction: arr[6],
         authorIntroduction: arr[7],
         score: arr[8],
-        bookType
+        type
       }).catch(err => {
         console.log(err)
       })
@@ -68,9 +75,9 @@ async function saveBooksToDB (bookType, filePath) {
 }
 
 (async function () {
-  await saveFilmsToDB()
   await saveMusicsToDB()
   await saveBooksToDB('计算机图书', 'data/computer_books_info.txt')
   await saveBooksToDB('名著', 'data/masterpiece_books_info.txt')
   await saveBooksToDB('小说', 'data/novel_books_info.txt')
+  await saveFilmsToDB()
 })()

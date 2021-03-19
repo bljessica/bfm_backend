@@ -54,12 +54,12 @@ const bookSchema = new Schema({
   score: {
     type: String
   },
-  bookType: {
+  type: {
     type: String,
     enum: ['计算机图书', '小说', '名著']
   }
 })
-bookSchema.index({name: 1, bookType: 1}, {unique: true})
+bookSchema.index({name: 1, type: 1}, {unique: true})
 
 const filmSchema = new Schema({
   name: {
@@ -76,7 +76,19 @@ const filmSchema = new Schema({
   introduction: {
     type: String
   },
-  relatedInfo: {
+  director: {
+    type: String
+  },
+  actors: {
+    type: String
+  },
+  publishTime: {
+    type: String
+  },
+  country: {
+    type: String
+  },
+  type: {
     type: String
   },
   score: {
@@ -96,7 +108,7 @@ const musicSchema = new Schema({
   publishTime: {
     type: String
   },
-  musicType: {
+  type: {
     type: String
   },
   coverSrc: {
@@ -110,8 +122,7 @@ const musicSchema = new Schema({
 const recordSchema = new Schema({
   openid: {
     type: String,
-    required: true,
-    unique: true
+    required: true
   },
   kind: {
     type: String,

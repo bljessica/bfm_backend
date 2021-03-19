@@ -20,6 +20,11 @@ router.post('/addUser', async(req, res) => {
         }))
       }
     })
+  } else {
+    res.send(JSON.stringify({
+      code: 0,
+      msg: '用户已存在'
+    }))
   }
 })
 
