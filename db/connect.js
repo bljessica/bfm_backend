@@ -149,6 +149,10 @@ const recordSchema = new Schema({
   },
   score: {  // after 才有
     type: Number
+  },
+  newest: {
+    type: Boolean,
+    default: true
   }
 })
 recordSchema.index({openid: 1, kind: 1, name: 1, status: 1, commentTime: 1}, {unique: true})

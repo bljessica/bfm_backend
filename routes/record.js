@@ -7,6 +7,11 @@ router.post('/addRecord', async(req, res) => {
   if (obj.status === 'doing' || obj.status === 'none') {
     await Record.deleteOne(obj)
   }
+  await Record.updateOne({
+    openid: obj.openid,
+    kind: obj.kind,
+    name: obj.name
+  }, {newest: false})
   await Record.create(obj)
   res.send(JSON.stringify({
     code: 0,
@@ -50,7 +55,7 @@ router.get('/itemComments', async(req, res) => {
 router.get('/userAnalysis', async(req, res) => {
   let obj = req.query
   const data = await Record.aggregate([
-    {$match: {openid: obj.openid}},
+    {$match: {openid: obj.openid, newest: true}},
     {
       $group: {
         _id: {status: '$status', kind: '$kind'},
@@ -83,7 +88,7 @@ router.get('/userAnalysisDetail', async (req, res) => {
           foreignField: 'name',
           as: kind
         }},
-        {$match: {openid: obj.openid, status: statusCur, kind}},
+        {$match: {openid: obj.openid, status: statusCur, kind, newest: true}},
         {$unwind: '$' + kind}
       ])
       for(let item of data[kind][statusCur]) {
@@ -109,7 +114,7 @@ router.get('/filmTagAnalysis', async (req, res) => {
   let obj = req.query
   const records = await Record.aggregate([
     {
-      $match: {openid: obj.openid, kind: 'film', status: obj.status || 'after'}
+      $match: {openid: obj.openid, kind: 'film', status: obj.status || 'after', newest: true}
     },
     {
       $lookup: {

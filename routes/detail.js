@@ -17,7 +17,8 @@ router.get('/detail', async(req, res) => {
   const record = await Record.findOne({
     openid: obj.openid,
     kind: obj.kind,
-    name: data.name
+    name: data.name,
+    newest: true
   }).sort({_id: -1})
   if (record) {
     status = record.status
