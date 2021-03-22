@@ -65,6 +65,46 @@ router.get('/userAnalysis', async(req, res) => {
   }))
 })
 
+router.get('/userAnalysisDetail', async (req, res) => {
+  const obj = req.query
+  const data = {
+    book: {},
+    film: {},
+    music: {}
+  }
+  const kinds = ['book', 'film', 'music']
+  const status = ['after', 'want', 'doing']
+  for(let kind of kinds) {
+    for(let statusCur of status) {
+      data[kind][statusCur] = await Record.aggregate([
+        {$lookup: {
+          from: kind + 's',
+          localField: 'name',
+          foreignField: 'name',
+          as: kind
+        }},
+        {$match: {openid: obj.openid, status: statusCur, kind}},
+        {$unwind: '$' + kind}
+      ])
+      for(let item of data[kind][statusCur]) {
+        Object.assign(item, item[kind])
+        delete item[kind]
+      }
+      if (kind === 'book') {
+        // 去重
+        data[kind][statusCur] = data[kind][statusCur].filter((item, idx) => 
+          (data[kind][statusCur].findIndex(cur => cur.name === item.name) === idx)
+        )
+      }
+    }
+  }
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '查询成功',
+    data
+  }))
+})
+
 router.get('/filmTagAnalysis', async (req, res) => {
   let obj = req.query
   const records = await Record.aggregate([
