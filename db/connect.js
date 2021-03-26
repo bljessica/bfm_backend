@@ -59,7 +59,6 @@ const bookSchema = new Schema({
     enum: ['计算机图书', '小说', '名著']
   }
 })
-bookSchema.index({name: 1, type: 1}, {unique: true})
 
 const filmSchema = new Schema({
   name: {

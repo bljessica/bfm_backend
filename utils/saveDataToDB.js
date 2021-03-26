@@ -57,19 +57,27 @@ async function saveBooksToDB (type, filePath) {
   for(let line of dataArr) {
     const arr = line.split('\t')
     if (/.*http.*/.test(arr[5])) {
-      await Book.create({
-        name: arr[0],
-        author: arr[1],
-        publisher: arr[2],
-        publishTime: arr[3],
-        coverSrc: arr[5],
-        introduction: arr[6],
-        authorIntroduction: arr[7],
-        score: arr[8],
-        type
-      }).catch(err => {
-        console.log(err)
-      })
+      const book = await Book.findOne({name: arr[0]})
+      if (book) {
+        if (book.type !== type && book.type.indexOf(type) !== -1) {
+          const bookType = book.type
+          await Book.updateOne({name: arr[0]}, {type: bookType + ' ' + type})
+        }
+      } else {
+        await Book.create({
+          name: arr[0],
+          author: arr[1],
+          publisher: arr[2],
+          publishTime: arr[3],
+          coverSrc: arr[5],
+          introduction: arr[6],
+          authorIntroduction: arr[7],
+          score: arr[8],
+          type
+        }).catch(err => {
+          console.log(err)
+        })
+      }
     }
   }
 }
