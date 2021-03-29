@@ -10,6 +10,14 @@ cd bfm_backend
 npm i
 ```
 
+### 将书影音数据存入数据库
+
+如已存在bfm数据库，需要先删除
+
+```
+node utils/saveDataToDB.js
+```
+
 ### 开发环境热更新
 ```
 npm run dev
