@@ -95,12 +95,6 @@ router.get('/userAnalysisDetail', async (req, res) => {
         Object.assign(item, item[kind])
         delete item[kind]
       }
-      if (kind === 'book') {
-        // 去重
-        data[kind][statusCur] = data[kind][statusCur].filter((item, idx) => 
-          (data[kind][statusCur].findIndex(cur => cur.name === item.name) === idx)
-        )
-      }
     }
   }
   res.send(JSON.stringify({
@@ -110,39 +104,100 @@ router.get('/userAnalysisDetail', async (req, res) => {
   }))
 })
 
-router.get('/filmTagAnalysis', async (req, res) => {
-  let obj = req.query
-  const records = await Record.aggregate([
-    {
-      $match: {openid: obj.openid, kind: 'film', status: obj.status || 'after', newest: true}
-    },
-    {
-      $lookup: {
-        from: 'films',
-        localField: 'name',
-        foreignField: 'name',
-        as: 'films'
-      }
-    },
-    {$unwind: '$films'},
-    {$project: {type: '$films.type'}}
+router.get('/userAnalysisSectionItems', async (req, res) => {
+  const obj = req.query
+  let data = await Record.aggregate([
+    {$lookup: {
+      from: obj.kind + 's',
+      localField: 'name',
+      foreignField: 'name',
+      as: obj.kind
+    }},
+    {$match: {openid: obj.openid, status: obj.status, kind: obj.kind, newest: true}},
+    {$unwind: '$' + obj.kind}
   ])
-  let data = {}
-  records.forEach(record => {
-    const item = record.type.substring(0, record.type.length - 1)
-    const tags = item.split(' ')
-    tags.forEach(tag => {
-      if (data[tag]) {
-        data[tag]++
-      } else {
-        data[tag] = 1
-      }
-    })
-  })
+  for(let item of data) {
+    Object.assign(item, item[obj.kind])
+    delete item[obj.kind]
+  }
   res.send(JSON.stringify({
     code: 0,
     msg: '查询成功',
     data
+  }))
+})
+
+router.get('/doneItemsAnalysis', async(req, res) => {
+  let obj = req.query
+  const total = await Record.find({
+    openid: obj.openid,
+    status: 'after',
+    kind: obj.kind,
+    newest: true
+  }).count()
+  const recentDoneItems = await Record.aggregate([
+    {
+      $match: {openid: obj.openid, kind: obj.kind, status: 'after', newest: true}
+    },
+    {
+      $lookup: {
+        from: obj.kind + 's',
+        localField: 'name',
+        foreignField: 'name',
+        as: 'item'
+      }
+    },
+    {$unwind: '$item'},
+    {$project: {coverSrc: '$item.coverSrc'}},
+    {$sort: {_id: -1}},
+    {$limit: 9}
+  ])
+  const records = await Record.aggregate([
+    {
+      $match: {openid: obj.openid, kind: obj.kind, status: 'after', newest: true}
+    },
+    {
+      $lookup: {
+        from: obj.kind + 's',
+        localField: 'name',
+        foreignField: 'name',
+        as: 'item'
+      }
+    },
+    {$unwind: '$item'},
+    {$project: {type: '$item.type', publishTime: '$item.publishTime', country: '$item.country'}}
+  ])
+  const itemInfos = {
+    type: {},
+    publishTime: {}
+  }
+  if (obj.kind === 'film') {
+    itemInfos.country = {}
+  }
+  records.forEach(record => {
+    for(let tagType of Object.keys(itemInfos)) {
+      let item = record[tagType].trim()
+      if (tagType === 'publishTime') {
+        item = item.substring(0, 4)
+      }
+      const tags = item.split(' ')
+      tags.forEach(tag => {
+        if (itemInfos[tagType][tag]) {
+          itemInfos[tagType][tag]++
+        } else {
+          itemInfos[tagType][tag] = 1
+        }
+      })
+    }
+  })
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '查询成功',
+    data: {
+      total,
+      recentDoneItems,
+      itemInfos
+    }
   }))
 })
 

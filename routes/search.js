@@ -24,9 +24,6 @@ router.post('/search', async(req, res) => {
     {$match: {name: {$regex: '.*' + obj.searchText + '.*'}}},
     {$project: {kind: 'book', name: 1, coverSrc: 1, publishTime: 1, score: 1,author: 1, publisher: 1}}
   ])
-  bookData = bookData.filter((book, idx) => {
-    return bookData.findIndex(item => item.name === book.name) === idx
-  })
   const data = filmData.concat(musicData).concat(bookData).concat([])
   data.sort((a, b) => {
     return a.name.indexOf(obj.searchText) - b.name.indexOf(obj.searchText)
