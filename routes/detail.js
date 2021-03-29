@@ -7,6 +7,7 @@ router.get('/detail', async(req, res) => {
   let kind = obj.kind
   let data = null
   let status = 'none'
+  let myScore = null
   if (kind === 'book') {
     data = await Book.findOne({_id: obj._id})
   } else if (kind === 'film') {
@@ -22,12 +23,14 @@ router.get('/detail', async(req, res) => {
   }).sort({_id: -1})
   if (record) {
     status = record.status
+    myScore = (record.score === undefined) ? null : record.score 
   }
   res.send(JSON.stringify({
     code: 0,
     msg: '获取成功',
     data,
-    status
+    status,
+    myScore
   }))
 })
 

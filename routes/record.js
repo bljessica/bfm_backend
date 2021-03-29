@@ -7,7 +7,7 @@ router.post('/addRecord', async(req, res) => {
   if (obj.status === 'doing' || obj.status === 'none') {
     await Record.deleteOne(obj)
   }
-  await Record.updateOne({
+  await Record.updateMany({
     openid: obj.openid,
     kind: obj.kind,
     name: obj.name

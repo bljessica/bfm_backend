@@ -21,9 +21,10 @@ router.post('/addUser', async(req, res) => {
       }
     })
   } else {
+    await User.updateOne({openid: obj.openid}, obj)
     res.send(JSON.stringify({
       code: 0,
-      msg: '用户已存在'
+      msg: '成功更新用户信息'
     }))
   }
 })
