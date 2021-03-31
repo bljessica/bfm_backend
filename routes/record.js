@@ -206,10 +206,12 @@ router.get('/timeLineData', async(req, res) => {
   const obj = req.query
   // 最近
   let latestContents = []
+  let firstContents = []
   const kinds = ['book', 'film', 'music']
   const status = ['after', 'want', 'doing']
   for(let kind of kinds) {
     for(let statusCur of status) {
+      // 本月内
       const arr = await Record.aggregate([
         {$lookup: {
           from: kind + 's',
@@ -219,9 +221,26 @@ router.get('/timeLineData', async(req, res) => {
         }},
         {$match: {openid: obj.openid, status: statusCur, kind, newest: true,
           time: {$gte: dayjs().startOf('month').valueOf(), $lt: dayjs().endOf('month').valueOf()}}},
-        {$unwind: '$detail'}
+        {$unwind: '$detail'},
+        {$sort: {time: 1}}
       ])
       latestContents = latestContents.concat(arr)
+      // 各种类第一个after的
+      if (statusCur === 'after') {
+        const tmp = await Record.aggregate([
+          {$lookup: {
+            from: kind + 's',
+            localField: 'name',
+            foreignField: 'name',
+            as: 'detail'
+          }},
+          {$match: {openid: obj.openid, status: statusCur, kind, newest: true}},
+          {$unwind: '$detail'},
+          {$sort: {time: 1}},
+          {$limit: 1}
+        ])
+        firstContents = firstContents.concat(tmp)
+      }
     }
   }
   latestContents.sort((a, b) => (b.time - a.time))
@@ -242,6 +261,10 @@ router.get('/timeLineData', async(req, res) => {
         name: '最近',
         contents: latestContents,
         statistics: latestStatistics
+      },
+      first: {
+        name: '精彩回顾',
+        contents: firstContents
       }
     }
   }))

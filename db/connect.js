@@ -154,8 +154,7 @@ const recordSchema = new Schema({
     default: true
   },
   time: {
-    type: Number,
-    default: Date.now()
+    type: Number
   }
 })
 recordSchema.index({openid: 1, kind: 1, name: 1, status: 1, commentTime: 1}, {unique: true})
