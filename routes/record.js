@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const dayjs = require('dayjs')
 const { Record, LikeComment } = require('../db/connect')
 
 router.post('/addRecord', async(req, res) => {
@@ -197,6 +198,51 @@ router.get('/doneItemsAnalysis', async(req, res) => {
       total,
       recentDoneItems,
       itemInfos
+    }
+  }))
+})
+
+router.get('/timeLineData', async(req, res) => {
+  const obj = req.query
+  // 最近
+  let latestContents = []
+  const kinds = ['book', 'film', 'music']
+  const status = ['after', 'want', 'doing']
+  for(let kind of kinds) {
+    for(let statusCur of status) {
+      const arr = await Record.aggregate([
+        {$lookup: {
+          from: kind + 's',
+          localField: 'name',
+          foreignField: 'name',
+          as: 'detail'
+        }},
+        {$match: {openid: obj.openid, status: statusCur, kind, newest: true,
+          time: {$gte: dayjs().startOf('month').valueOf(), $lt: dayjs().endOf('month').valueOf()}}},
+        {$unwind: '$detail'}
+      ])
+      latestContents = latestContents.concat(arr)
+    }
+  }
+  latestContents.sort((a, b) => (b.time - a.time))
+  const latestStatistics = await Record.aggregate([
+    {$match: {openid: obj.openid, newest: true}},
+    {
+      $group: {
+        _id: {status: '$status', kind: '$kind'},
+        count: {$sum: 1}
+      }
+    }
+  ])
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '查询成功',
+    data: {
+      latest: {
+        name: '最近',
+        contents: latestContents,
+        statistics: latestStatistics
+      }
     }
   }))
 })

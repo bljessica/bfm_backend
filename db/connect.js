@@ -152,6 +152,10 @@ const recordSchema = new Schema({
   newest: {
     type: Boolean,
     default: true
+  },
+  time: {
+    type: Number,
+    default: Date.now()
   }
 })
 recordSchema.index({openid: 1, kind: 1, name: 1, status: 1, commentTime: 1}, {unique: true})
