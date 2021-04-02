@@ -38,6 +38,31 @@ router.post('/addRecord', async(req, res) => {
   }))
 })
 
+router.put('/editComment', async(req, res) => {
+  const obj = req.body
+  console.log(obj)
+  await Record.updateOne({
+    _id: obj._id
+  }, {
+    comment: obj.comment
+  })
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '修改成功'
+  }))
+})
+
+router.delete('/deleteComment', async(req, res) => {
+  const obj = req.body
+  await Record.deleteOne({
+    _id: obj._id
+  })
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '修改成功'
+  }))
+})
+
 router.get('/itemComments', async(req, res) => {
   let obj = req.query
   const data = await Record.aggregate([
