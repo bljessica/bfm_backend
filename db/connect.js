@@ -157,7 +157,7 @@ const recordSchema = new Schema({
     type: Number
   }
 })
-recordSchema.index({openid: 1, kind: 1, name: 1, status: 1, commentTime: 1}, {unique: true})
+recordSchema.index({openid: 1, kind: 1, name: 1, status: 1, time: 1}, {unique: true})
 
 const likeCommentSchema = new Schema({
   openid: {

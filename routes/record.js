@@ -5,15 +5,33 @@ const { Record, LikeComment } = require('../db/connect')
 
 router.post('/addRecord', async(req, res) => {
   let obj = req.body
-  if (obj.status === 'doing' || obj.status === 'none') {
-    await Record.deleteOne(obj)
-  }
   await Record.updateMany({
     openid: obj.openid,
     kind: obj.kind,
     name: obj.name
   }, {newest: false})
-  await Record.create(obj)
+  if (obj.status === 'doing') {
+    const record = await Record.findOne({
+      openid: obj.openid,
+      name: obj.name,
+      status: obj.status,
+      kind: obj.kind
+    })
+    if (record) { // 删除
+      console.log('delete')
+      await Record.deleteOne({
+        openid: obj.openid,
+        name: obj.name,
+        status: obj.status,
+        kind: obj.kind
+      })
+    } else { // 添加
+      await Record.create(obj)
+    }
+  } 
+  if (obj.status !== 'none' && obj.status !== 'doing') {
+    await Record.create(obj)
+  }
   res.send(JSON.stringify({
     code: 0,
     msg: '添加成功'
@@ -49,6 +67,33 @@ router.get('/itemComments', async(req, res) => {
   res.send(JSON.stringify({
     code: 0,
     msg: '添加成功',
+    data
+  }))
+})
+
+router.get('/userComments', async(req, res) => {
+  let obj = req.query
+  let data = []
+  const kinds = ['book', 'film', 'music']
+  const status = obj.status
+  for(let kind of kinds) {
+    const arr = await Record.aggregate([
+      {$lookup: {
+        from: kind + 's',
+        localField: 'name',
+        foreignField: 'name',
+        as: 'detail'
+      }},
+      {$match: {openid: obj.openid, status, kind}},
+      {$unwind: '$detail'},
+      {$sort: {time: 1}}
+    ])
+    data = data.concat(arr)
+  }
+  data.sort((a, b) => (b.time - a.time))
+  res.send(JSON.stringify({
+    code: 0,
+    msg: null,
     data
   }))
 })
