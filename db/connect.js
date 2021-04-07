@@ -25,6 +25,13 @@ const userSchema = new Schema({
   },
   avatarUrl: {
     type: String
+  },
+  city: {
+    type: String
+  },
+  gender: {
+    type: Number,
+    enum: [1, 2] // 1 男, 2 女
   }
 })
 

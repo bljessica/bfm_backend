@@ -20,13 +20,41 @@ router.post('/addUser', async(req, res) => {
         }))
       }
     })
-  } else {
-    await User.updateOne({openid: obj.openid}, obj)
+  } 
+  else {
     res.send(JSON.stringify({
       code: 0,
-      msg: '成功更新用户信息'
+      msg: '用户已存在'
     }))
   }
+})
+
+router.get('/userInfo', async(req, res) => {
+  const obj = req.query
+  const data = await User.findOne({
+    openid: obj.openid
+  })
+  if (data) {
+    res.send(JSON.stringify({
+      code: 0,
+      msg: '查询成功',
+      data
+    }))
+  } else {
+    res.send(JSON.stringify({
+      code: 1,
+      msg: '用户不存在'
+    }))
+  }
+})
+
+router.put('/updateUser', async(req, res) => {
+  let obj = req.body
+  const r = await User.updateOne({openid: obj.openid}, obj)
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '成功更新用户信息'
+  }))
 })
 
 module.exports = router
