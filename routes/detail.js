@@ -1,4 +1,4 @@
-const {Book, Film, Music, Record} =  require('../db/connect')
+const {Book, Film, Music, Record, LikeComment} =  require('../db/connect')
 const express = require('express')
 const router = express.Router()
 
@@ -31,6 +31,43 @@ router.get('/detail', async(req, res) => {
     data,
     status,
     myScore
+  }))
+})
+
+router.delete('/deleteItem', async (req, res) => {
+  const obj = req.body
+  if (obj.kind === 'book') {
+    await Book.deleteOne({_id: obj._id})
+  } else if (obj.kind === 'film') {
+    await Film.deleteOne({_id: obj._id})
+  } else if (obj.kind === 'music') {
+    await Music.deleteOne({_id: obj._id})
+  } else {
+    res.send(JSON.stringify({
+      code: 1,
+      msg: '种类不存在'
+    }))
+    return
+  }
+  const records = await Record.find({
+    kind: obj.kind,
+    openid: obj.openid,
+    name: obj.name
+  })
+  for (let record of records) {
+    await LikeComment.deleteOne({
+      recordId: record._id,
+      openid: obj.openid
+    })
+  }
+  await Record.deleteMany({
+    kind: obj.kind,
+    openid: obj.openid,
+    name: obj.name
+  })
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '删除成功'
   }))
 })
 
