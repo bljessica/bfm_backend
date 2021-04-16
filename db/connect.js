@@ -66,8 +66,7 @@ const bookSchema = new Schema({
     type: String
   },
   type: {
-    type: String,
-    enum: ['计算机图书', '小说', '名著']
+    type: String
   }
 })
 

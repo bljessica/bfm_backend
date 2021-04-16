@@ -71,4 +71,94 @@ router.delete('/deleteItem', async (req, res) => {
   }))
 })
 
+router.post('/addItem', async(req, res) => {
+  const obj = req.body
+  if (obj.kind === 'book') {
+    const item = await Book.findOne({name: obj.info.name})
+    if (item) {
+      res.send(JSON.stringify({
+        code: 1,
+        msg: '此名字的图书已存在'
+      }))
+      return
+    }
+    await Book.create(obj.info)
+  } else if (obj.kind === 'film') {
+    const item = await Film.findOne({name: obj.info.name})
+    if (item) {
+      res.send(JSON.stringify({
+        code: 1,
+        msg: '此名字的电影已存在'
+      }))
+      return
+    }
+    await Film.create(obj.info)
+  } else if (obj.kind === 'music') {
+    const item = await Music.findOne({name: obj.info.name})
+    if (item) {
+      res.send(JSON.stringify({
+        code: 1,
+        msg: '此名字的音乐已存在'
+      }))
+      return
+    }
+    await Music.create(obj.info)
+  } else {
+    res.send(JSON.stringify({
+      code: 1,
+      msg: '种类不存在'
+    }))
+    return
+  }
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '添加成功'
+  }))
+})
+
+router.put('/updateItem', async(req, res) => {
+  const obj = req.body
+  if (obj.kind === 'book') {
+    const item = await Book.findOne({name: obj.info.name})
+    if (item && item._id != obj._id) {
+      res.send(JSON.stringify({
+        code: 1,
+        msg: '此名字的图书已存在'
+      }))
+      return
+    }
+    await Book.updateOne({_id: obj._id}, obj.info)
+  } else if (obj.kind === 'film') {
+    const item = await Film.findOne({name: obj.info.name})
+    if (item && item._id != obj._id) {
+      res.send(JSON.stringify({
+        code: 1,
+        msg: '此名字的电影已存在'
+      }))
+      return
+    }
+    await Film.updateOne({_id: obj._id}, obj.info)
+  } else if (obj.kind === 'music') {
+    const item = await Music.findOne({name: obj.info.name})
+    if (item && item._id != obj._id) {
+      res.send(JSON.stringify({
+        code: 1,
+        msg: '此名字的音乐已存在'
+      }))
+      return
+    }
+    await Music.updateOne({_id: obj._id}, obj.info)
+  } else {
+    res.send(JSON.stringify({
+      code: 1,
+      msg: '种类不存在'
+    }))
+    return
+  }
+  res.send(JSON.stringify({
+    code: 0,
+    msg: '修改成功'
+  }))
+})
+
 module.exports = router
