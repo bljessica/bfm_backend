@@ -4,7 +4,7 @@ const dayjs = require('dayjs')
 const { Record, LikeComment } = require('../db/connect')
 
 router.post('/addRecord', async(req, res) => {
-  let obj = req.body
+  const obj = req.body
   await Record.updateMany({
     openid: obj.openid,
     kind: obj.kind,
@@ -64,7 +64,7 @@ router.delete('/deleteComment', async(req, res) => {
 })
 
 router.get('/itemComments', async(req, res) => {
-  let obj = req.query
+  const obj = req.query
   const data = await Record.aggregate([
     {
       $lookup: {
@@ -97,7 +97,7 @@ router.get('/itemComments', async(req, res) => {
 })
 
 router.get('/userComments', async(req, res) => {
-  let obj = req.query
+  const obj = req.query
   let data = []
   const kinds = ['book', 'film', 'music']
   const status = obj.status
@@ -124,7 +124,7 @@ router.get('/userComments', async(req, res) => {
 })
 
 router.get('/userAnalysis', async(req, res) => {
-  let obj = req.query
+  const obj = req.query
   const data = await Record.aggregate([
     {$match: {openid: obj.openid, newest: true}},
     {
@@ -199,7 +199,7 @@ router.get('/userAnalysisSectionItems', async (req, res) => {
 })
 
 router.get('/doneItemsAnalysis', async(req, res) => {
-  let obj = req.query
+  const obj = req.query
   const total = await Record.find({
     openid: obj.openid,
     status: 'after',

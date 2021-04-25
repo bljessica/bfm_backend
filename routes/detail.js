@@ -3,7 +3,7 @@ const express = require('express')
 const router = express.Router()
 
 router.get('/detail', async(req, res) => {
-  let obj = req.query
+  const obj = req.query
   let kind = obj.kind
   let data = null
   let status = 'none'

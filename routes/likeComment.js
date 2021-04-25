@@ -3,7 +3,7 @@ const router = express.Router()
 const { LikeComment, Record } = require('../db/connect')
 
 router.put('/likeOrUnlikeComment', async(req, res) => {
-  let obj = req.body
+  const obj = req.body
   const likeRecord = await LikeComment.findOne(obj)
   if (likeRecord) {
     await LikeComment.deleteOne(obj)

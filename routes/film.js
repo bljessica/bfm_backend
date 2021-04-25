@@ -3,7 +3,7 @@ const router = express.Router()
 const { Film, Record } = require('../db/connect')
 
 router.get('/allFilms', async(req, res) => {
-  let obj = req.query
+  const obj = req.query
   obj.pageSize = parseInt(obj.pageSize)
   const total = await Film.find().count()
   const data = await Film.find().skip((obj.pageSize || 0) * ((obj.pageIdx - 1) || 0)).limit(obj.pageSize).sort({_id: -1})
@@ -16,7 +16,7 @@ router.get('/allFilms', async(req, res) => {
 })
 
 router.get('/filmTagAnalysis', async (req, res) => {
-  let obj = req.query
+  const obj = req.query
   const records = await Record.aggregate([
     {
       $match: {openid: obj.openid, kind: 'film', status: obj.status || 'after', newest: true}

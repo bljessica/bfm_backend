@@ -3,7 +3,7 @@ const router = express.Router()
 const { User } = require('../db/connect')
 
 router.post('/addUser', async(req, res) => {
-  let obj = req.body
+  const obj = req.body
   const user = await User.findOne({openid: obj.openid})
   if (!user) {
     await User.create(obj, (err) => {
@@ -49,11 +49,29 @@ router.get('/userInfo', async(req, res) => {
 })
 
 router.put('/updateUser', async(req, res) => {
-  let obj = req.body
-  const r = await User.updateOne({openid: obj.openid}, obj)
+  const obj = req.body
+  await User.updateOne({openid: obj.openid}, obj)
   res.send(JSON.stringify({
     code: 0,
     msg: '成功更新用户信息'
+  }))
+})
+
+router.get('/allUserInfo', async(req, res) => {
+  const data = await User.find()
+  res.send(JSON.stringify({
+    code: 0,
+    msg: null,
+    data
+  }))
+})
+
+router.delete('/user', async(req, res) => {
+  const obj = req.body
+  await User.deleteOne({openid: obj.openid})
+  res.send(JSON.stringify({
+    code: 0,
+    msg: null
   }))
 })
 

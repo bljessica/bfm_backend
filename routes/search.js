@@ -3,7 +3,7 @@ const router = express.Router()
 const { Film, Music, Book } = require('../db/connect')
 
 router.post('/search', async(req, res) => {
-  let obj = req.body
+  const obj = req.body
   if (!obj.searchText) {
     res.send(JSON.stringify({
       code: 0,
