@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { User } = require('../db/connect')
+const { User, Record, LikeComment } = require('../db/connect')
 
 router.post('/addUser', async(req, res) => {
   const obj = req.body
@@ -68,6 +68,11 @@ router.get('/allUserInfo', async(req, res) => {
 
 router.delete('/user', async(req, res) => {
   const obj = req.body
+  const records = await Record.find({openid: obj.openid})
+  const recordsIds = records.map(item => item._id)
+  await LikeComment.deleteMany({recordId: {$in: recordsIds}})
+  await LikeComment.deleteMany({openid: obj.openid})
+  await Record.deleteMany({openid: obj.openid})
   await User.deleteOne({openid: obj.openid})
   res.send(JSON.stringify({
     code: 0,
