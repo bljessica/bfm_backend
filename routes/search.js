@@ -12,19 +12,28 @@ router.post('/search', async(req, res) => {
     }))
     return
   }
-  const filmData = await Film.aggregate([
-    {$match: {name: {$regex: '.*' + obj.searchText + '.*'}}},
-    {$project: {kind: 'film', name: 1, coverSrc: 1, publishTime: 1, score: 1,country: 1, type: 1, director: 1, actors: 1}}
-  ])
-  const musicData = await Music.aggregate([
-    {$match: {name: {$regex: '.*' + obj.searchText + '.*'}}},
-    {$project: {kind: 'music', name: 1, coverSrc: 1, publishTime: 1, score: 1,singer: 1}}
-  ])
-  let bookData = await Book.aggregate([ 
-    {$match: {name: {$regex: '.*' + obj.searchText + '.*'}}},
-    {$project: {kind: 'book', name: 1, coverSrc: 1, publishTime: 1, score: 1,author: 1, publisher: 1}}
-  ])
-  const data = filmData.concat(musicData).concat(bookData).concat([])
+  let filmData = []
+  let musicData = []
+  let bookData = []
+  if (obj.type === 'all' || obj.type === 'film') {
+    filmData = await Film.aggregate([
+      {$match: {name: {$regex: '.*' + obj.searchText + '.*'}}},
+      {$project: {kind: 'film', name: 1, coverSrc: 1, publishTime: 1, score: 1,country: 1, type: 1, director: 1, actors: 1}}
+    ])
+  }
+  if (obj.type === 'all' || obj.type === 'music') {
+    musicData = await Music.aggregate([
+      {$match: {name: {$regex: '.*' + obj.searchText + '.*'}}},
+      {$project: {kind: 'music', name: 1, coverSrc: 1, publishTime: 1, score: 1,singer: 1}}
+    ])
+  }
+  if (obj.type === 'all' || obj.type === 'book') {
+    bookData = await Book.aggregate([ 
+      {$match: {name: {$regex: '.*' + obj.searchText + '.*'}}},
+      {$project: {kind: 'book', name: 1, coverSrc: 1, publishTime: 1, score: 1,author: 1, publisher: 1}}
+    ])
+  }
+  const data = filmData.concat(musicData).concat(bookData)
   data.sort((a, b) => {
     return a.name.indexOf(obj.searchText) - b.name.indexOf(obj.searchText)
   })

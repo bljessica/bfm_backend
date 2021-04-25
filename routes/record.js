@@ -102,16 +102,32 @@ router.get('/userComments', async(req, res) => {
   const kinds = ['book', 'film', 'music']
   const status = obj.status
   for(let kind of kinds) {
+    const matchObj = { status, kind }
+    if (obj.openid) {
+      matchObj.openid = obj.openid
+    }
+    console.log(matchObj)
     const arr = await Record.aggregate([
-      {$lookup: {
-        from: kind + 's',
-        localField: 'name',
-        foreignField: 'name',
-        as: 'detail'
-      }},
-      {$match: {openid: obj.openid, status, kind}},
+      {
+        $lookup: {
+          from: kind + 's',
+          localField: 'name',
+          foreignField: 'name',
+          as: 'detail'
+        }
+      },
+      {$match: matchObj},
       {$unwind: '$detail'},
-      {$sort: {time: 1}}
+      {$sort: {time: 1}},
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'openid',
+          foreignField: 'openid',
+          as: 'user'
+        }
+      },
+      {$unwind: '$user'},
     ])
     data = data.concat(arr)
   }

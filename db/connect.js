@@ -32,10 +32,6 @@ const userSchema = new Schema({
   gender: {
     type: Number,
     enum: [1, 2] // 1 男, 2 女
-  },
-  isAdmin: {
-    type: Boolean,
-    default: false
   }
 })
 

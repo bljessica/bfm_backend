@@ -51,18 +51,15 @@ router.delete('/deleteItem', async (req, res) => {
   }
   const records = await Record.find({
     kind: obj.kind,
-    openid: obj.openid,
     name: obj.name
   })
   for (let record of records) {
-    await LikeComment.deleteOne({
-      recordId: record._id,
-      openid: obj.openid
+    await LikeComment.deleteMany({
+      recordId: record._id
     })
   }
   await Record.deleteMany({
     kind: obj.kind,
-    openid: obj.openid,
     name: obj.name
   })
   res.send(JSON.stringify({
